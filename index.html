@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jarvis AI System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    
+<div class="jarvis-header">
+        <video width="100px" autoplay loop muted>
+           <source src="/static/b4e14f7f48cb4377b8e5f9157535b1aa.webm" type="video/mp4" autoplay loop muted>
+        </video>
+    <h1 class="text">J.A.R.V.I.S </h1>
+
+</div>
+
+
+<div class="container">
+    
+    <!-- CENTER -->
+    <div class="center-panel">
+        <div class="jarvis-core">
+             <video width="1000px" autoplay loop muted>
+                <source src="/static/video.mp4" type="video/mp4" autoplay loop muted>
+             </video>
+
+            <div class="search-box">
+                <input id="userInput" type="text"
+                       placeholder="Ask me anything..."
+                       onkeydown="handleEnter(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT CHAT -->
+    <div class="chat-panel">
+        <div class="chat-header">JARVIS RESPONSE</div>
+        <div class="messages" id="messages"></div>
+    </div>
+
+</div>
+
+<script>
+let lastReply = "";
+
+function handleEnter(e) {
+    if (e.key === "Enter") {
+        sendMessage();
+    }
+}
+
+function sendMessage() {
+    const input = document.getElementById("userInput");
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    input.value = "";
+
+    fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: msg })
+    })
+    .then(res => res.json())
+    .then(data => {
+        lastReply = data.reply;
+        addBotMessage(data.reply);
+    });
+}
+
+function addBotMessage(text) {
+    const div = document.createElement("div");
+    div.className = "bot-msg";
+    div.innerText = text + " 🔊";
+
+    div.onclick = () => {
+        const speech = new SpeechSynthesisUtterance(lastReply);
+        speech.lang = "en-US";
+        window.speechSynthesis.speak(speech);
+    };
+
+    document.getElementById("messages").appendChild(div);
+}
+</script>
+
+</body>
+</html>
